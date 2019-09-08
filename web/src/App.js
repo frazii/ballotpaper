@@ -10,14 +10,13 @@ const App = () => {
     const [privateKey, setPrivateKey] = useState(
         Buffer.from(Wavelet.generateNewWallet().secretKey, 'binary').toString('hex')
     );
-    //const [privateKey, setPrivateKey] = useState('9a968f9ee69d705adcbfa096ccb6fa3578249f301c24b597bfb51334ef49d37e3ab4e8d01e9734d391256e3c63fb502b4df296be5195db81b26bd6a396c10f76')
     const [client, setClient] = useState(undefined);
     const [node, setNodeInfo] = useState(undefined);
     const [contractAddress, setContractAddress] = useState(
         '6ca5dabf374f1dfed1728fcb8b83115c41209b262bc1fe1839042866076de349'
     );
     const [contract, setContract] = useState(undefined);
-    
+
     ////////
     const [voteLogs, setVoteLogs] = useState([]);
     const [voteYear, setVoteYear] = useState('');
@@ -78,7 +77,6 @@ const App = () => {
         setContract(undefined);
         setContractAddress('');
 
-        setMessage('');
         setVoteLogs([]);
         setVoteYear('');
         setVoteLocation('');
@@ -237,14 +235,13 @@ const App = () => {
             value: ''
         });
 
-        setMessage('');
+        //setMessage('');
 
         setCandidate1VoteInput(0);
         setCandidate2VoteInput(0);
         setCandidate3VoteInput(0);
         setCandidate4VoteInput(0);
         setCandidate5VoteInput(0);
-        //setIsVoteSubmitted(0);
     };
 
     const sendVoteValue = async () => {
@@ -254,14 +251,11 @@ const App = () => {
             value: candidate1VoteInput + ',' + candidate2VoteInput + ',' + candidate3VoteInput + ',' + candidate4VoteInput + ',' + candidate5VoteInput
         });
 
-        setMessage('');
-
         setCandidate1VoteInput(0);
         setCandidate2VoteInput(0);
         setCandidate3VoteInput(0);
         setCandidate4VoteInput(0);
         setCandidate5VoteInput(0);
-        //setIsVoteSubmitted(1);
     };
 
     return (
