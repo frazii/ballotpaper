@@ -17,7 +17,7 @@ const App = () => {
         '6ca5dabf374f1dfed1728fcb8b83115c41209b262bc1fe1839042866076de349'
     );
     const [contract, setContract] = useState(undefined);
-    s
+    
     ////////
     const [voteLogs, setVoteLogs] = useState([]);
     const [voteYear, setVoteYear] = useState('');
