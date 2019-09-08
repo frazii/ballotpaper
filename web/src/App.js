@@ -1,7 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Contract, Wavelet} from 'wavelet-client';
-import {FaucetButton} from "wavelet-faucet";
-import {themes} from "wavelet-faucet"
 import {Box, Flex} from '@rebass/grid';
 import JSBI from 'jsbi';
 
@@ -19,8 +17,7 @@ const App = () => {
         '6ca5dabf374f1dfed1728fcb8b83115c41209b262bc1fe1839042866076de349'
     );
     const [contract, setContract] = useState(undefined);
-    const [message, setMessage] = useState('');
-
+    s
     ////////
     const [voteLogs, setVoteLogs] = useState([]);
     const [voteYear, setVoteYear] = useState('');
@@ -368,8 +365,6 @@ const App = () => {
                         </ul>
                       </Box>
                   </Flex>
-
-                  <FaucetButton modalHeader theme={themes.mono} style={{position: 'fixed', right: '100px', bottom: '0px'}} address={account && account.public_key}/>
 
                 </Box>
 
