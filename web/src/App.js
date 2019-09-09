@@ -13,12 +13,11 @@ const App = () => {
     const [client, setClient] = useState(undefined);
     const [node, setNodeInfo] = useState(undefined);
     const [contractAddress, setContractAddress] = useState(
-        '6ca5dabf374f1dfed1728fcb8b83115c41209b262bc1fe1839042866076de349'
+        '7eabb6b015076bf4a2f932a75db38621f91e31e6d7cae70d046bf8ad3f11cb9e'
     );
     const [contract, setContract] = useState(undefined);
 
     ////////
-    const [voteLogs, setVoteLogs] = useState([]);
     const [voteYear, setVoteYear] = useState('');
     const [voteLocation, setVoteLocation] = useState('');
 
@@ -68,6 +67,59 @@ const App = () => {
         socketsRef.current = sockets;
     }, [sockets]);
 
+    const fetchCandidateVoteNames = (contract, wallet) => {
+        setCandidate1Name(contract.test(wallet, 'get_candidate1_name', BigInt(0)).logs);
+        setCandidate2Name(contract.test(wallet, 'get_candidate2_name', BigInt(0)).logs);
+        setCandidate3Name(contract.test(wallet, 'get_candidate3_name', BigInt(0)).logs);
+        setCandidate4Name(contract.test(wallet, 'get_candidate4_name', BigInt(0)).logs);
+        setCandidate5Name(contract.test(wallet, 'get_candidate5_name', BigInt(0)).logs);
+    }
+
+    const fetchCandidateVoteRanks = (contract, wallet) => {
+        setCandidate1Vote(contract.test(wallet, 'get_candidate1_vote', BigInt(0)).logs);
+        setCandidate2Vote(contract.test(wallet, 'get_candidate2_vote', BigInt(0)).logs);
+        setCandidate3Vote(contract.test(wallet, 'get_candidate3_vote', BigInt(0)).logs);
+        setCandidate4Vote(contract.test(wallet, 'get_candidate4_vote', BigInt(0)).logs);
+        setCandidate5Vote(contract.test(wallet, 'get_candidate5_vote', BigInt(0)).logs);
+    }
+
+    const fetchIsVoted = (contract, wallet) => {
+        setIsVoteSubmitted(contract.test(wallet, 'is_vote_submitted', BigInt(0)).logs);
+    }
+
+    const fetchVoteSettings = (contract, wallet) => {
+        setVoteYear(contract.test(wallet, 'get_vote_year', BigInt(0)).logs);
+        setVoteLocation(contract.test(wallet, 'get_vote_location', BigInt(0)).logs);
+    }
+
+    const resetCandidateVote = () => {
+        setCandidate1Vote(0);
+        setCandidate2Vote(0);
+        setCandidate3Vote(0);
+        setCandidate4Vote(0);
+        setCandidate5Vote(0);
+    }
+
+    const resetCandidateVoteInput = () => {
+        setCandidate1VoteInput(0);
+        setCandidate2VoteInput(0);
+        setCandidate3VoteInput(0);
+        setCandidate4VoteInput(0);
+        setCandidate5VoteInput(0);
+    }
+
+    const resetVoteSettings = () => {
+        setVoteYear('');
+        setVoteLocation('');
+        setIsVoteSubmitted(undefined);
+
+        setCandidate1Name('------, ------ (------)');
+        setCandidate2Name('------, ------ (------)');
+        setCandidate3Name('------, ------ (------)');
+        setCandidate4Name('------, ------ (------)');
+        setCandidate5Name('------, ------ (------)');
+    }
+
     const reset = () => {
         setClient(undefined);
         setAccount(undefined);
@@ -77,29 +129,9 @@ const App = () => {
         setContract(undefined);
         setContractAddress('');
 
-        setVoteLogs([]);
-        setVoteYear('');
-        setVoteLocation('');
-
-        setCandidate1Name('------, ------ (------)');
-        setCandidate2Name('------, ------ (------)');
-        setCandidate3Name('------, ------ (------)');
-        setCandidate4Name('------, ------ (------)');
-        setCandidate5Name('------, ------ (------)');
-
-        setCandidate1Vote(0);
-        setCandidate2Vote(0);
-        setCandidate3Vote(0);
-        setCandidate4Vote(0);
-        setCandidate5Vote(0);
-
-        setCandidate1VoteInput(0);
-        setCandidate2VoteInput(0);
-        setCandidate3VoteInput(0);
-        setCandidate4VoteInput(0);
-        setCandidate5VoteInput(0);
-
-        setIsVoteSubmitted(undefined);
+        resetCandidateVote();
+        resetCandidateVoteInput();
+        resetVoteSettings();
 
         const sockets = socketsRef.current;
 
@@ -167,7 +199,7 @@ const App = () => {
         const wallet = Wavelet.loadWalletFromPrivateKey(privateKey);
 
         // Every single time consensus happens on Wavelet, query for the latest
-        // vote logs by calling 'get_messages()' on the smart contract.
+        // vote logs by calling 'fetchCandidateVoteRanks()' on the smart contract.
 
         sockets.consensus = await client.pollConsensus({
             onRoundEnded: _ => {
@@ -177,13 +209,8 @@ const App = () => {
 
                 (async () => {
                     await contract.fetchAndPopulateMemoryPages();
-                    setVoteLogs(contract.test(wallet, 'get_votes', BigInt(0)).logs);
-                    setCandidate1Vote(contract.test(wallet, 'get_candidate1_vote', BigInt(0)).logs);
-                    setCandidate2Vote(contract.test(wallet, 'get_candidate2_vote', BigInt(0)).logs);
-                    setCandidate3Vote(contract.test(wallet, 'get_candidate3_vote', BigInt(0)).logs);
-                    setCandidate4Vote(contract.test(wallet, 'get_candidate4_vote', BigInt(0)).logs);
-                    setCandidate5Vote(contract.test(wallet, 'get_candidate5_vote', BigInt(0)).logs);
-                    setIsVoteSubmitted(contract.test(wallet, 'is_vote_submitted', BigInt(0)).logs);
+                    fetchCandidateVoteRanks(contract, wallet);
+                    fetchIsVoted(contract, wallet);
                 })();
             }
         });
@@ -207,41 +234,12 @@ const App = () => {
 
         setSockets(sockets);
 
-        setVoteLogs(contract.test(wallet, 'get_votes', BigInt(0)).logs);
-        setVoteYear(contract.test(wallet, 'get_vote_year', BigInt(0)).logs);
-        setVoteLocation(contract.test(wallet, 'get_vote_location', BigInt(0)).logs);
-
-        setCandidate1Name(contract.test(wallet, 'get_candidate1_name', BigInt(0)).logs);
-        setCandidate2Name(contract.test(wallet, 'get_candidate2_name', BigInt(0)).logs);
-        setCandidate3Name(contract.test(wallet, 'get_candidate3_name', BigInt(0)).logs);
-        setCandidate4Name(contract.test(wallet, 'get_candidate4_name', BigInt(0)).logs);
-        setCandidate5Name(contract.test(wallet, 'get_candidate5_name', BigInt(0)).logs);
-
-        setCandidate1Vote(contract.test(wallet, 'get_candidate1_vote', BigInt(0)).logs);
-        setCandidate2Vote(contract.test(wallet, 'get_candidate2_vote', BigInt(0)).logs);
-        setCandidate3Vote(contract.test(wallet, 'get_candidate3_vote', BigInt(0)).logs);
-        setCandidate4Vote(contract.test(wallet, 'get_candidate4_vote', BigInt(0)).logs);
-        setCandidate5Vote(contract.test(wallet, 'get_candidate5_vote', BigInt(0)).logs);
-
-        setIsVoteSubmitted(contract.test(wallet, 'is_vote_submitted', BigInt(0)).logs);
+        fetchVoteSettings(contract, wallet);
+        fetchCandidateVoteNames(contract, wallet);
+        fetchCandidateVoteRanks(contract, wallet);
+        fetchIsVoted(contract, wallet);
 
         setContract(contract);
-    };
-
-    const clearVotes = async () => {
-        const wallet = Wavelet.loadWalletFromPrivateKey(privateKey);
-        await contract.call(wallet, 'clear_votes', BigInt(0), BigInt(250000), BigInt(0), {
-            type: 'string',
-            value: ''
-        });
-
-        //setMessage('');
-
-        setCandidate1VoteInput(0);
-        setCandidate2VoteInput(0);
-        setCandidate3VoteInput(0);
-        setCandidate4VoteInput(0);
-        setCandidate5VoteInput(0);
     };
 
     const sendVoteValue = async () => {
@@ -251,11 +249,7 @@ const App = () => {
             value: candidate1VoteInput + ',' + candidate2VoteInput + ',' + candidate3VoteInput + ',' + candidate4VoteInput + ',' + candidate5VoteInput
         });
 
-        setCandidate1VoteInput(0);
-        setCandidate2VoteInput(0);
-        setCandidate3VoteInput(0);
-        setCandidate4VoteInput(0);
-        setCandidate5VoteInput(0);
+        resetCandidateVoteInput();
     };
 
     return (

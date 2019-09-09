@@ -1,4 +1,3 @@
-use std::error::Error;
 use smart_contract_macros::smart_contract;
 use smart_contract::log;
 use smart_contract::payload::Parameters;
@@ -13,7 +12,6 @@ struct Vote {
     logs: VecDeque<Entry>,
     year: String,
     location: String,
-    //candidates: Vec<String>
     candidate1_name: String,
     candidate1_vote: u32,
     candidate2_name: String,
@@ -37,13 +35,6 @@ fn prune_old_votes(vote: &mut Vote) {
     if vote.logs.len() > MAX_LOG_CAPACITY {
         vote.logs.pop_front();
     }
-}
-
-fn to_hex_string(bytes: [u8; 32]) -> String {
-    let strs: Vec<String> = bytes.iter()
-        .map(|b| format!("{:02x}", b))
-        .collect();
-    strs.join("")
 }
 
 fn convert_to_vote_points(param: u32) -> u32 {
@@ -97,7 +88,6 @@ impl Vote {
 
     fn is_vote_submitted(&mut self, _params: &mut Parameters) -> Result<(), String> {
         // Checking if the vote has already been made by the sender
-        //let entry = Entry { sender: params.sender, message: params.read() };
         let mut record_found: u32 = 0;
 
         for entry_saved in &self.logs {
@@ -111,19 +101,6 @@ impl Vote {
         Ok(())
     }
 
-
-    fn clear_votes(&mut self, _params: &mut Parameters) -> Result<(), String> {
-
-        self.candidate1_vote = 0;
-        self.candidate2_vote = 0;
-        self.candidate3_vote = 0;
-        self.candidate4_vote = 0;
-        self.candidate5_vote = 0;
-
-        delete_all_votes(self);
-        Ok(())
-    }
-
     fn send_vote(&mut self, params: &mut Parameters) -> Result<(), String> {
         let entry = Entry { sender: params.sender, message: params.read() };
 
@@ -132,20 +109,10 @@ impl Vote {
              return Err("Message must not be empty.".to_string());
         }
 
-        // Ensure that message are at most 240 characters.
+        // Ensure that message are at most 9 characters.
         if entry.message.len() > MAX_MESSAGE_SIZE {
             return Err(format!("Message must not be more than {} characters.", MAX_MESSAGE_SIZE));
         }
-
-        // Checking if the vote has already been made by the sender
-        /*
-        for entry_saved in &self.logs {
-            // messages.insert(0, format!("<{}> {}", &to_hex_string(entry.sender)[..16], entry.message));
-            if entry_saved.sender == entry.sender {
-                return Err("Sender already has voted".to_string());
-            }
-        }
-        */
 
         // calcuating vote points
         let vote_values: Vec<&str> = entry.message.split(",").collect();
@@ -179,86 +146,62 @@ impl Vote {
         Ok(())
     }
 
-    fn get_votes(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        let mut messages = Vec::new();
-
-        for entry in &self.logs {
-            messages.insert(0, format!("<{}> {}", &to_hex_string(entry.sender)[..16], entry.message));
-        }
-
-        log(&messages.join("\n"));
-
-        Ok(())
-    }
-
     fn get_vote_year(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.year = "2019".to_string();
         log(&self.year);
         Ok(())
     }
 
     fn get_vote_location(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.location);
         Ok(())
     }
 
     fn get_candidate1_name(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate1_name);
         Ok(())
     }
 
     fn get_candidate2_name(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate2_name);
         Ok(())
     }
 
     fn get_candidate3_name(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate3_name);
         Ok(())
     }
 
     fn get_candidate4_name(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate4_name);
         Ok(())
     }
 
     fn get_candidate5_name(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate5_name);
         Ok(())
     }
 
     fn get_candidate1_vote(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate1_vote.to_string());
         Ok(())
     }
 
     fn get_candidate2_vote(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate2_vote.to_string());
         Ok(())
     }
 
     fn get_candidate3_vote(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate3_vote.to_string());
         Ok(())
     }
 
     fn get_candidate4_vote(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate4_vote.to_string());
         Ok(())
     }
 
     fn get_candidate5_vote(&mut self, _params: &mut Parameters) -> Result<(), String> {
-        //self.location = "NORTH HUDSON".to_string();
         log(&self.candidate5_vote.to_string());
         Ok(())
     }
