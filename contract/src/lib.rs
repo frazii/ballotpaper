@@ -27,10 +27,6 @@ struct Vote {
 const MAX_LOG_CAPACITY: usize = 200;
 const MAX_MESSAGE_SIZE: usize = 9; // e.g. 1,2,3,4,5
 
-fn delete_all_votes(vote: &mut Vote) {
-    vote.logs.clear();
-}
-
 fn prune_old_votes(vote: &mut Vote) {
     if vote.logs.len() > MAX_LOG_CAPACITY {
         vote.logs.pop_front();
